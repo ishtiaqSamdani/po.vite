@@ -24,12 +24,12 @@ jobs:
       - name: install the dependencies
         if: steps.cache.outputs.cache-hit!=true
         run: npm install
-      - name: create the .env file
-        run: echo "${{ secrets.FRONTEND_ENV }}" > .env
+      #   - name: create the .env file
+      #     run: echo "${{ secrets.FRONTEND_ENV }}" > .env
       - name: create the build folder
         run: npm run build
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: ./dist
