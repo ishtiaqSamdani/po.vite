@@ -1,0 +1,35 @@
+name: portfolio deployment
+on:
+  push:
+    branches:
+      - "main"
+jobs:
+  frontend:
+    name: frontend image build and deploy
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+      - name: cache node modules
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-node_modules-${{ hashFiles('frontend/package.json') }}
+      - name: setup node version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: install the dependencies
+        if: steps.cache.outputs.cache-hit!=true
+        run: npm install
+      - name: create the .env file
+        run: echo "${{ secrets.FRONTEND_ENV }}" > .env
+      - name: create the build folder
+        run: npm run build
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
